@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Paintviz</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/visualizer.css') }}">
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		  <div class="container-fluid container">
+		    <a class="navbar-brand" href="/">Paintviz</a>
+		    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+		      <span class="navbar-toggler-icon"></span>
+		    </button>
+		    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+		      <ul class="navbar-nav">
+		        <li class="nav-item dropdown">
+		          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+		            File
+		          </a>
+		          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+		            <li><a class="dropdown-item" href="/">New Image</a></li>
+		            <li><a id="download" class="dropdown-item" href="{{ url_for('static', filename='images/' + image + '.png') }}" download>Download</a></li>
+		          </ul>
+		        </li>
+
+		        <!-- <li class="nav-item">
+		          <a class="nav-link" href="#">Features</a>
+		        </li> -->
+
+		        <li class="nav-item">
+		          <a class="nav-link" href="/about">About</a>
+		        </li>
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
+
+
+		<div id="content" class="container mt-5">
+			<div class="row">
+				<!-- Image Canvas -->
+				<div class="col-md-8 col-sm-12">
+					<!-- <div id="section-1"> -->
+						<div id="img-overlay">
+							<img id="img-canvas" src="{{ url_for('static', filename='images/' + image + '.png') }}" class="img-fluid" alt="...">
+
+							<div id="loader" class="spinner-grow" role="status">
+							    <span class="visually-hidden">Loading...</span>
+							</div>
+						</div>
+						
+
+						<!-- <div id="loader" class="text-center">
+						  <div class="spinner-border" role="status">
+						    <span class="visually-hidden">Loading...</span>
+						  </div>
+						</div> -->
+					<!-- </div> -->
+				</div>
+
+				<!-- Option Buttons -->
+				<div class="col-md-4 col-sm-12 mt-2">
+					<div>
+						<div class="d-grid gap-2">
+						  	<button id="detect" class="btn btn-dark" type="button">
+								<i class="bi bi-search"></i>
+							      Detect Walls
+							</button>
+
+							<button id="paint" class="btn btn-dark" type="button">
+								<i class="bi bi-magic"></i>
+							      Apply Paint
+							</button>
+						</div>
+					</div>
+
+					<div class="mt-4">
+						<!-- Color Picker -->
+						<div class="accordion" id="accordionExample">
+							<div class="accordion-item">
+								<h2 class="accordion-header" id="headingOne">
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+										<i class="bi bi-eyedropper"></i>
+											Colour Picker
+										</button>
+								</h2>
+								<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+									<div id="palatte"	class="accordion-body">
+										<label for="color-picker">Pick a colour</label>
+										<input type="color" id="color-picker" name="color-picker" value="#000">
+									</div>
+								</div>
+							</div>
+
+							<!-- Color Suggestions -->
+							<div class="accordion-item">
+								<h2 class="accordion-header" id="headingTwo">
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+										<i class="bi bi-app-indicator"></i>
+											Colour Suggestions
+										</button>
+								</h2>
+								<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+									<div class="accordion-body">
+										<div id="color-grid" class="row row-cols-3 row-cols-md-4 g-4">
+
+											{% for colorset in colors.values(): %}
+												{% for color in colorset: %}
+													<div class="col">
+														<div class="card" onclick="handleColorClick('{{ color }}')">
+															<div class="color-display" style="background-color: {{ color }};" data-value="{{ color }}"></div>
+															<div class="card-body color-box">
+																<h6 class="card-title color-value">{{ color }}</h6>
+															</div>
+														</div>
+													</div>
+												{% endfor %}
+											{% endfor %}
+
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Color Palette Generator -->
+							<div class="accordion-item">
+								<h2 class="accordion-header" id="headingThree">
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+										<i class="bi bi-palette-fill"></i>
+											Colour Palette Generator
+										</button>
+								</h2>
+								<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+									<div class="accordion-body">
+										<input type="file" onchange="readURL(this);" />
+										<img id="img-pallete" class="img-thumbnail w-50 my-4 " src="#" alt="your image" />
+										<div id="palette-grid" class="row row-cols-3 row-cols-md-4 g-4">
+											<!-- {% for colorset in colors.values(): %}
+												{% for color in colorset: %}
+													<div class="col">
+														<div class="card" onclick="handleColorClick('{{ color }}')">
+															<div class="color-display" style="background-color: {{ color }};" data-value="{{ color }}"></div>
+															<div class="card-body color-box">
+																<h6 class="card-title color-value">{{ color }}</h6>
+															</div>
+														</div>
+													</div>
+												{% endfor %}
+											{% endfor %} -->
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<script type="text/javascript" src="{{ url_for('static', filename='js/visualizer.js') }}"></script>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+	</body>
+</html>

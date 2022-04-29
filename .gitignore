@@ -1,0 +1,7 @@
+__pycache__/
+.vscode/
+images/
+detectron2/
+demo/
+tests/
+output/
